@@ -3,35 +3,24 @@
 
 import axios from "axios";
 import { Component } from "react";
-import PokemonCard from "./PokemonCard";
+
 
 // shows the name of it as well.
 export default class Pokemon extends Component{
-  constructor() {
-    super();
-    this.state = {
-      show: false
-    };
-    this.showModal = this.showModal.bind(this);
-    this.hideModal = this.hideModal.bind(this);
-  }
 
-  showModal = () => {
-    const {pokemon,id} = this.props;
-    return(
-      <div><PokemonCard key={pokemon.name} id={id} pokemon={pokemon}/></div>
-    )
-  };
-
-  hideModal = () => {
-    this.setState({ show: false });
-  };
     render(){
-      const {pokemon,id} = this.props;
-      return <div className="pokemon--species">
-              <div className="pokemon--species--container">        
-                <button className="pokemon--species--name" type="button" onClick={this.showModal}> {pokemon.name} </button>
+      const {pokemon,id,showCard} = this.props;
+      return<div class="col-md-4">
+              <div class="card mb-4 box-shadow">
+                <img class="card-img-top"  src={"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/"+`${id}`+".png"} alt="" /> 
+                  <div class="caption">
+                    <h3>{pokemon.name}</h3>
+                    <p><a href="#" class="btn btn-primary" role="button"  onClick={showCard}>INFOS</a></p>
+                  </div>
+                  </div>
               </div>
-            </div>;
       }
   }
+
+
+ 

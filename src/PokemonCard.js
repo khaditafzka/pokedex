@@ -9,22 +9,29 @@ export default class PokemonCard extends Component{
     
   
     async getData(id) {
-   
-        let res = await axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`);
-        console.log(res.data.sprites);
-        return res.data.sprites.front_default;
-        // setImg(res.data.sprites.front_default);
-        // setType(res.data.types[0].type.name);
-      }
+      let res=""
+      await axios.get(`https://pokeapi.co/api/v2/pokemon/${id}`)
+        .then((resp)=>  {
+          console.log(resp.data);
+        
+         res = resp.data.sprites.front_default;
+        }).catch((error)=>console.log(error))
+     
+        return res;
+    }
+
     render(){
-      const {pokemon,id} = this.props;
-      return <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
-              <div className="pokemon--species--container">
-                <div className="pokemon--species--sprite">
-                <img src={this.getData(id)} alt="" /> 
-                </div>
-                <div className="pokemon--species--name"> {pokemon.name} </div>
-              </div>
-            </div>;
+      const {id,name} = this.props;
+      console.log(this.getData(id));
+      return<div class="container">
+      <div class="card p-2">
+        <img class="card-img-top"  src={"https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/"+`${id}`+".png"} alt="" /> 
+          <div class="caption">
+            <h3>{name}</h3>
+            
+          </div>
+          </div>
+      </div>
+          
       }
   }
