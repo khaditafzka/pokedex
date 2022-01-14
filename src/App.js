@@ -11,6 +11,7 @@ class App extends Component {
 
     this.state ={
       all_pokemon:[],
+      filtered:[],
       fetched : false,
       loading : false,
       selected: false,
@@ -18,6 +19,7 @@ class App extends Component {
       name:""
 
     }
+    this.handleChange = this.handleChange.bind(this);
     
   }  
 
@@ -33,7 +35,7 @@ class App extends Component {
     this.setState({
       loading : true
     });
-    const url = 'https://pokeapi.co/api/v2/pokemon?offset=0&limit=200';
+    const url = 'https://pokeapi.co/api/v2/pokemon?offset=0&limit=50';
     axios({
       url    : url,
       method : 'GET',
@@ -42,6 +44,7 @@ class App extends Component {
                 console.log(response.data);
                 this.setState({
                   all_pokemon:response.data.results,
+                  filtered:response.data.results,
                   loading : true,
                   fetched : true,
                   
@@ -52,66 +55,77 @@ class App extends Component {
   componentDidMount(){
     this.getAllPokemon()
   }
+  handleChange(e) {
+		// Variable to hold the original version of the list
+    let currentList = [];
+		// Variable to hold the filtered list before putting into state
+    let newList = [];
+
+		// If the search bar isn't empty
+    if (e.target.value !== "") {
+			// Assign the original list to currentList
+      currentList = this.state.all_pokemon;
+
+			// Use .filter() to determine which items should be displayed
+			// based on the search terms
+      newList = currentList.filter(item => {
+				// change current item to lowercase
+        const lc = item.name.toLowerCase();
+				// change search term to lowercase
+        const filter = e.target.value.toLowerCase();
+				// check to see if the current list item includes the search term
+				// If it does, it will be added to newList. Using lowercase eliminates
+				// issues with capitalization in search terms and search content
+        return lc.includes(filter);
+      });
+    } else {
+			// If the search bar is empty, set newList to original task list
+      newList = this.state.all_pokemon;
+    }
+		// Set the filtered state based on what our rules added to newList
+    this.setState({
+      filtered: newList
+    });
+  }
   render(){
-    const {fetched, loading, all_pokemon,selected} = this.state;
-    let content ;
-    if(fetched){
-      content =  <div class="container">
+    const {fetched, loading, filtered,selected} = this.state;
+    return(
+      <div class="container">
           <div class="py-5 text-center">
-          <h2>POKEDEX</h2>
-          <p class="lead">Below is an example of pokedex made with https://pokeapi.co/.</p>
-          <div>
-          <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search"/>
-                  
+            <h2>POKEDEX</h2>
+            <p class="lead">Below is an example of pokedex made with https://pokeapi.co/.</p>
+            <div>
+            <input class="form-control mr-sm-2" type='text' placeholder="Search" aria-label="Search" onChange={this.handleChange}/>
+            </div>
           </div>
-        
-        </div>
-      <div class="row">
-                  <div class="col-8">
-                    <div class="album py-5 bg-light">
-                      <div class="container">
-                        <div class="row">
-                          {all_pokemon.map((pokemon,index)=><Pokemon key={pokemon.name} id={index+1} pokemon={pokemon} showCard={() => this.showCard(index+1,pokemon.name)}/>)} 
-                        </div>
-                      </div>
-                    </div>
+          <div class="row">
+            <div class="col-8">
+              <div class="album py-5 bg-light">
+                <div class="container">
+                  <div class="row">
+                      {fetched?
+                        filtered.map((pokemon,index)=><Pokemon key={pokemon.name} id={index+1} pokemon={pokemon} showCard={() => this.showCard(index+1,pokemon.name)}/>):
+                        <p> Loading ...</p>
+                          }
                   </div>
-                  <div class="col-4">
-                  <div class="container">
-                  <div class="py-5 text-center">
-                  
-                    {!selected?<blockquote class="blockquote"><p class="mb-0"> choose a pokemon</p></blockquote>: <PokemonCard name={this.state.name} id={this.state.id}/>}
-                    </div>
-                    </div>
-                </div>
-          {/* <PokemonCard key={this.state.name} id={this.state.id}/> */}
-      </div>;
+              </div>
+              </div>
+            </div>
+          <div class="col-4">
+            <div class="container">
+              <div class="py-5 text-center">
+                  {!selected?<blockquote class="blockquote"><p class="mb-0"> choose a pokemon</p></blockquote>: <PokemonCard name={this.state.name} id={this.state.id}/>}
+              </div>
+              </div>
+              </div>
+          </div>
+      
       </div>
-    }
-    // else if(fetched && selected) {
-    //   content =<div class="row">
-    //     <div class="col-xs-12 col-md-8">{all_pokemon.map((pokemon,index)=><Pokemon key={pokemon.name} 
-    //     id={index+1} pokemon={pokemon} showCard={() => this.showCard(index+1,pokemon.name)}/>)} 
-    //    </div>
-    //     <div class="col-xs-6 col-md-4">
-    //     <p> l</p>
-       
-    //    </div>
-    //       {/* <PokemonCard key={this.state.name} id={this.state.id}/> */}
-    //   </div>
-    // }
-    else if(loading && !fetched){
-      content = <p> Loading ...</p>;
-  }
-    else{
-      content = <div/>;
-    }
-    return  <div>
-      {content}
-    </div>;
-    
-  }
- 
+            
+    )
+
+  
+}
 }
 
 export default App;
